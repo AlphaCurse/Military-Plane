@@ -1,0 +1,111 @@
+---
+title: "Military Airplane Acceptance"
+author: "Tyler Brown"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Import Libraries
+```{r}
+library(tidyr)
+library(dplyr)
+```
+
+## Read the Data
+```{r}
+url = 'https://raw.githubusercontent.com/AlphaCurse/Military-Plane/main/militaryplaneacceptance.csv'
+df = read.csv(url)
+head(df)
+```
+
+## Tidy and Transform Data
+Lets remove rows 2, 3 and 4 to bring the data together. Additionally, rename column 1 to Year and remove the month from the last element of that column.
+```{r}
+df = df %>%
+  filter(!row_number() %in% c(2, 3, 4))
+
+colnames(df)[1] = 'Year'
+df$Year[7] = 1945
+df
+```
+
+Converting all character columns to integers for calculations.
+```{r}
+df$Total = as.integer(gsub(",","",df$Total))
+df$VH.Bombers = as.integer(gsub(",","",df$VH.Bombers))
+df$Heavy.Bombers = as.integer(gsub(",","",df$Heavy.Bombers))
+df$Medium.Bombers = as.integer(gsub(",","",df$Medium.Bombers))
+df$Light.Bomber = as.integer(gsub(",","",df$Light.Bomber))
+df$Fighters = as.integer(gsub(",","",df$Fighters))
+df$Reconnaissance = as.integer(gsub(",","",df$Reconnaissance))
+df$Transports = as.integer(gsub(",","",df$Transports))
+df$Trainers = as.integer(gsub(",","",df$Trainers))
+df$Communications = as.integer(gsub(",","",df$Communications))
+head(df)
+```
+
+Lets replace the NA value with 0.
+```{r}
+df$VH.Bombers[2] = 0
+df$VH.Bombers = as.integer(df$VH.Bombers)
+head(df)
+```
+
+## Identify for each type of aircraft listed in the table the sharpest drop in acceptances between 2 consecutive years.
+Since the analysis is of each aircraft, we can elimate the total column and grand total row.
+```{r}
+new_df = df %>%
+  select(Year, VH.Bombers, Heavy.Bombers, Medium.Bombers, Light.Bomber, Fighters, Reconnaissance, Transports, Trainers, Communications)
+head(new_df)
+```
+```{r}
+new_df = new_df %>%
+  filter(!row_number() %in% c(1))
+new_df
+```
+
+For the VH Bomber airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$VH.Bombers)
+```
+
+For the Heavy Bomber airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$Heavy.Bombers)
+```
+
+For the Medium Bomber airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$Medium.Bombers)
+```
+
+For the Light Bomber airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$Light.Bomber)
+```
+
+For the Fighter airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$Fighters)
+```
+
+For the Reconnaissance airplanes, the sharpest drop was from 1940 to 1942.
+```{r}
+diff(new_df$Reconnaissance)
+```
+
+For the Transport airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$Transports)
+```
+
+For the Trainer airplanes, the sharpest drop was from 1942 to 1944.
+```{r}
+diff(new_df$Trainers)
+```
+
+For the Communication airplanes, the sharpest drop was from 1943 to 1945.
+```{r}
+diff(new_df$Communications)
+```
+From all of the drops, we can conclude majority of the airplanes had their sharpest drop between 1943 and 1945.
